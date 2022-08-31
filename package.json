@@ -29,7 +29,7 @@
     "@types/discord-rpc": "^4.0.3",
     "@types/luxon": "^3.0.0",
     "@types/node": "^18.7.13",
-    "@types/react": "^18.0.17",
+    "@types/react": "^18.0.18",
     "@types/react-dom": "^18.0.6",
     "@types/react-helmet": "^6.1.5",
     "@typescript-eslint/eslint-plugin": "^5.33.1",
