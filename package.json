@@ -40,7 +40,7 @@
     ]
   },
   "dependencies": {
-    "@tabler/icons": "^1.92.0",
+    "@tabler/icons": "^1.93.0",
     "autoprefixer": "^10.4.8",
     "discord-rpc": "^4.0.1",
     "luxon": "^3.0.2",
