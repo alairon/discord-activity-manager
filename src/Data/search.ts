@@ -1,7 +1,7 @@
 import Fuse from 'fuse.js';
-import { writeFile } from 'fs/promises';
 import { Activities } from '../types/activities';
-import { readFileSync } from 'fs';
+import { NetFetch } from './netFetch';
+import { readFileSync, existsSync, writeFileSync } from 'fs';
 
 interface FuseItem {
   item: Activities.Activity;
@@ -9,6 +9,7 @@ interface FuseItem {
 
 export class SearchManager {
   private fuse: Fuse<FuseItem>;
+  private dataPath: string = __dirname;
   private readonly config = {
     threshold: 0.3,
     ignoreLocation: true,
@@ -16,8 +17,26 @@ export class SearchManager {
   };
 
   constructor() {
-    const titles = this.readFile(__dirname + '/titles.json');
-    this.fuse = new Fuse(titles, this.config);
+    this.initData();
+  }
+
+  /* Creates a file with Discord verified IDs and saves it locally */
+  private async cacheData(titles: Array<FuseItem>): Promise<void> {
+    this.writeFile(this.dataPath + '/titles.json', titles);
+  }
+
+  /* Merges verified IDs with the ones set by the user*/
+  private async initData(): Promise<void> {
+    const titles: Array<FuseItem> = existsSync(this.dataPath + '/titles.json')
+      ? this.readFile(this.dataPath + '/titles.json')
+      : await NetFetch.fetch();
+    this.cacheData(titles);
+
+    const customTitles: Array<FuseItem> = existsSync('./custom.json')
+      ? this.readFile('./custom.json')
+      : [];
+
+    this.updateList(Object.assign(titles, customTitles));
   }
 
   private readFile(path: string): Array<FuseItem> {
@@ -25,8 +44,9 @@ export class SearchManager {
     return JSON.parse(data) || [];
   }
 
-  private static async writeFile(path: string, data: JSON): Promise<void> {
-    await writeFile(path, JSON.stringify(data), { encoding: 'utf-8' });
+  private writeFile(path: string, data: Array<FuseItem>): void {
+    console.log('Writing to: ' + path);
+    writeFileSync(path, JSON.stringify(data), { encoding: 'utf-8' });
   }
 
   public updateList(data: Array<FuseItem>): void {

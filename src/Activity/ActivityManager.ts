@@ -31,8 +31,11 @@ export class ActivityManager {
     await this.createActivity(prune(activity));
 
     if (this.activityProcess) {
-      this.activityProcess.on('exit', (code: number) => {
-        console.log(`Process exited with code ${code}`);
+      const activityProcess = this.activityProcess;
+      activityProcess.on('exit', (code: number) => {
+        activityProcess
+          ? console.log(`Process exited with code ${code}`)
+          : null;
       });
       this.activityProcess.on(
         'message',
@@ -47,7 +50,8 @@ export class ActivityManager {
       });
 
       return new Promise((resolve) => {
-        this.activityProcess.on('exit', (code: number) => {
+        const activityProcess = this.activityProcess;
+        activityProcess.on('exit', (code: number) => {
           resolve(code);
         }) || resolve(0);
       });
